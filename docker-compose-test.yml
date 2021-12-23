@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.test
+    container_name: test
+    command: sh -c "pytest -n auto -v"
+    environment:
+      SECRET_KEY: 123
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: db
+      POSTGRES_USER: lms
+      POSTGRES_PASSWORD: lms
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13-alpine
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=lms
+      - POSTGRES_USER=lms
+      - POSTGRES_PASSWORD=lms
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
