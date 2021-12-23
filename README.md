@@ -2,6 +2,7 @@
 
 <h4>Commands:</h4>
 Build the project (docker-compose build):<br>
+
 `make build`
 
 Up the project (docker-compose up -d):<br>
@@ -11,6 +12,7 @@ Run tests:<br>
 `make test`
 
 <h4>Envfile structure:</h4>
+
 ```
 DJANGO_SETTINGS_MODULE=
 POSTGRES_DB=
