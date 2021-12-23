@@ -29,8 +29,10 @@ services:
     restart: unless-stopped
     env_file:
       - .envfile
+    ports:
+      - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - shop_pg_db:/var/lib/postgresql/data
     logging:
       driver: 'json-file'
       options:
@@ -38,4 +40,4 @@ services:
         max-file: '1'
 
 volumes:
-  db-data:
+  shop_pg_db:
