@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
 from rest_framework.generics import ListAPIView, UpdateAPIView, CreateAPIView
 from rest_framework.response import Response
@@ -13,9 +14,15 @@ class ProductListAPIView(ListAPIView):
             model = Product
             fields = ('id', 'name', 'cost_price', 'price', 'quantity')
 
+    serializer_class = OutputSerializer
+
     def get_queryset(self) -> QuerySet:
         return Product.objects.get_queryset()
 
+    @extend_schema(
+        methods=['GET'],
+        responses={200: OutputSerializer(many=True)}
+    )
     def list(self, request, *args, **kwargs) -> Response:
         data = self.OutputSerializer(
             self.get_queryset(),
@@ -37,6 +44,13 @@ class ProductCreateAPIView(CreateAPIView):
             model = Product
             fields = ('id', 'name', 'cost_price', 'price', 'quantity')
 
+    serializer_class = InputSerializer
+
+    @extend_schema(
+        methods=['POST'],
+        request=InputSerializer,
+        responses={201: OutputSerializer}
+    )
     def create(self, request, *args, **kwargs) -> Response:
         serialized = self.InputSerializer(data=request.data)
         serialized.is_valid(raise_exception=True)
@@ -60,9 +74,16 @@ class ProductPartialUpdateAPIView(UpdateAPIView):
             model = Product
             fields = ('id', 'name', 'cost_price', 'price', 'quantity')
 
+    serializer_class = InputSerializer
+
     def get_queryset(self) -> QuerySet:
         return Product.objects.get_queryset()
 
+    @extend_schema(
+        methods=['PATCH', 'PUT'],
+        request=InputSerializer,
+        responses={201: OutputSerializer}
+    )
     def partial_update(self, request, *args, **kwargs) -> Response:
         serialized = self.InputSerializer(data=request.data)
         serialized.is_valid(raise_exception=True)
