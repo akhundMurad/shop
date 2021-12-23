@@ -7,6 +7,8 @@ services:
       dockerfile: docker/Dockerfile.test
     container_name: test
     command: sh -c "pytest -n auto -v"
+    volumes:
+      - .:/app/tests
     environment:
       SECRET_KEY: 123
       POSTGRES_PORT: 5432
