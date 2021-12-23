@@ -4,7 +4,7 @@ from rest_framework.generics import ListAPIView, UpdateAPIView, CreateAPIView
 from rest_framework.response import Response
 
 from ..models import Product
-from ..services.product import create_product
+from ..services.product import create_product, update_product
 
 
 class ProductListAPIView(ListAPIView):
@@ -46,4 +46,30 @@ class ProductCreateAPIView(CreateAPIView):
         return Response(
             data=self.OutputSerializer(product).data,
             status=status.HTTP_201_CREATED
+        )
+
+
+class ProductPartialUpdateAPIView(UpdateAPIView):
+    class InputSerializer(serializers.Serializer):
+        cost_price = serializers.IntegerField(required=False)
+        price = serializers.IntegerField(required=False)
+        quantity = serializers.IntegerField(required=False)
+
+    class OutputSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Product
+            fields = ('id', 'name', 'cost_price', 'price', 'quantity')
+
+    def get_queryset(self) -> QuerySet:
+        return Product.objects.get_queryset()
+
+    def partial_update(self, request, *args, **kwargs) -> Response:
+        serialized = self.InputSerializer(data=request.data)
+        serialized.is_valid(raise_exception=True)
+
+        product = update_product(pk=kwargs['pk'], **serialized.validated_data)
+
+        return Response(
+            data=self.OutputSerializer(product).data,
+            status=status.HTTP_200_OK
         )

@@ -15,6 +15,11 @@ product_patters = [
         'create/',
         product.ProductCreateAPIView.as_view(),
         name='product-create'
+    ),
+    path(
+        'partial-update/<int:pk>/',
+        product.ProductPartialUpdateAPIView.as_view(),
+        name='product-partial-update'
     )
 ]
 

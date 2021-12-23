@@ -15,6 +15,13 @@ def create_url() -> str:
 
 
 @pytest.fixture
+def partial_update_url(product) -> str:
+    return reverse(
+        'products:product-partial-update', kwargs={'pk': product.id}
+    )
+
+
+@pytest.fixture
 def product_data() -> dict:
     product = ProductFactory.build()
     return {
@@ -56,6 +63,32 @@ class TestProductCreateAPIView:
 
     def test_return_data(self, create_url, client, product_data, db):
         response = client.post(create_url, product_data)
+
+        assert 'id' in response.data
+        assert 'name' in response.data
+        assert 'cost_price' in response.data
+        assert 'price' in response.data
+        assert 'quantity' in response.data
+
+        assert isinstance(response.data['id'], int)
+        assert isinstance(response.data['name'], str)
+        assert isinstance(response.data['cost_price'], int)
+        assert isinstance(response.data['price'], int)
+        assert isinstance(response.data['quantity'], int)
+
+
+class TestProductPartialUpdateAPIView:
+    def test_return_200(self, partial_update_url, client, db):
+        response = client.patch(partial_update_url, data={
+            'name': 'asdas'
+        }, content_type='application/json')
+
+        assert response.status_code == 200
+
+    def test_return_data(self, partial_update_url, client, db):
+        response = client.patch(partial_update_url, {
+            'name': 'asdas'
+        }, content_type='application/json')
 
         assert 'id' in response.data
         assert 'name' in response.data
