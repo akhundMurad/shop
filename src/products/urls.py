@@ -11,6 +11,11 @@ product_patters = [
         product.ProductListAPIView.as_view(),
         name='product-list'
     ),
+    path(
+        'create/',
+        product.ProductCreateAPIView.as_view(),
+        name='product-create'
+    )
 ]
 
 urlpatterns = [
