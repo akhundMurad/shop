@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from products.views import product
+from products.views import product, order
 
 
 app_name = 'products'
@@ -23,6 +23,15 @@ product_patters = [
     )
 ]
 
+order_patterns = [
+    path(
+        'partial-update/<int:pk>/',
+        order.OrderPartialUpdateAPIView.as_view(),
+        name='order-partial-update'
+    )
+]
+
 urlpatterns = [
-    path('product/', include(product_patters))
+    path('product/', include(product_patters)),
+    path('order/', include(order_patterns))
 ]
