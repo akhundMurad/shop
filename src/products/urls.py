@@ -1,7 +1,6 @@
 from django.urls import path, include
 
-from products.views import product, order
-
+from products.views import product, order, orderedproduct
 
 app_name = 'products'
 
@@ -31,7 +30,18 @@ order_patterns = [
     )
 ]
 
+
+ordered_product_patterns = [
+    path(
+        'bulk-create/',
+        orderedproduct.OrderedProductBulkCreateAPIView.as_view(),
+        name='ordered-product-bulk-create'
+    )
+]
+
+
 urlpatterns = [
     path('product/', include(product_patters)),
-    path('order/', include(order_patterns))
+    path('order/', include(order_patterns)),
+    path('ordered-product/', include(ordered_product_patterns))
 ]
