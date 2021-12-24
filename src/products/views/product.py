@@ -1,7 +1,8 @@
 from django.db.models import QuerySet
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
-from rest_framework.generics import ListAPIView, UpdateAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from ..models import Product
@@ -63,7 +64,7 @@ class ProductCreateAPIView(CreateAPIView):
         )
 
 
-class ProductPartialUpdateAPIView(UpdateAPIView):
+class ProductPartialUpdateAPIView(APIView):
     class InputSerializer(serializers.Serializer):
         cost_price = serializers.IntegerField(required=False)
         price = serializers.IntegerField(required=False)
@@ -84,7 +85,7 @@ class ProductPartialUpdateAPIView(UpdateAPIView):
         request=InputSerializer,
         responses={201: OutputSerializer}
     )
-    def partial_update(self, request, *args, **kwargs) -> Response:
+    def patch(self, request, *args, **kwargs) -> Response:
         serialized = self.InputSerializer(data=request.data)
         serialized.is_valid(raise_exception=True)
 
