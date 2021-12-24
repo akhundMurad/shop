@@ -24,6 +24,7 @@ class Order(models.Model):
     )
     products = models.ManyToManyField(
         'products.Product',
+        through='products.OrderedProduct',
         verbose_name='продукты'
     )
     total_cost_price = models.PositiveIntegerField(
@@ -41,3 +42,22 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
+
+
+class OrderedProduct(models.Model):
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.CASCADE,
+        verbose_name='продукт'
+    )
+    order = models.ForeignKey(
+        'products.Order',
+        on_delete=models.CASCADE
+    )
+    product_quantity = models.PositiveIntegerField(
+        verbose_name='количество продуктов'
+    )
+
+    class Meta:
+        verbose_name = 'заказанный продукт'
+        verbose_name_plural = 'заказанные продукты'
