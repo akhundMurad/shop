@@ -23,24 +23,6 @@ services:
         max-size: "10m"
         max-file: "1"
 
-  celery:
-    image: backend
-    working_dir: /app
-    command: sh -c "celery -A backend.celery worker -l info"
-    volumes:
-      - ./src:/app
-    env_file:
-      - .envfile
-    depends_on:
-      - backend
-    restart: always
-    container_name: celery
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "1"
-
   pg_db:
     image: postgres:13-alpine
     container_name: pg_db
