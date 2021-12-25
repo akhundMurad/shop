@@ -1,7 +1,12 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
 class Product(models.Model):
+    class Meta:
+        verbose_name = 'продукт'
+        verbose_name_plural = 'продукты'
+
     name = models.CharField(max_length=512, verbose_name='название')
     cost_price = models.PositiveIntegerField(
         verbose_name='себестоимость',
@@ -16,12 +21,18 @@ class Product(models.Model):
         default=0
     )
 
-    class Meta:
-        verbose_name = 'продукт'
-        verbose_name_plural = 'продукты'
+    def clean(self):
+        if self.cost_price > self.price:
+            raise ValidationError(
+                'The cost price cannot be higher than price.'
+            )
 
 
 class Order(models.Model):
+    class Meta:
+        verbose_name = 'заказ'
+        verbose_name_plural = 'заказы'
+
     class Status(models.TextChoices):
         CANCELED = 'canceled', 'отменен'
         ON_PROCESSING = 'on_processing', 'на обработке'
@@ -53,12 +64,12 @@ class Order(models.Model):
         default=0
     )
 
-    class Meta:
-        verbose_name = 'заказ'
-        verbose_name_plural = 'заказы'
-
 
 class OrderedProduct(models.Model):
+    class Meta:
+        verbose_name = 'заказанный продукт'
+        verbose_name_plural = 'заказанные продукты'
+
     product = models.ForeignKey(
         'products.Product',
         on_delete=models.CASCADE,
@@ -72,7 +83,3 @@ class OrderedProduct(models.Model):
         verbose_name='количество продуктов',
         default=0
     )
-
-    class Meta:
-        verbose_name = 'заказанный продукт'
-        verbose_name_plural = 'заказанные продукты'
