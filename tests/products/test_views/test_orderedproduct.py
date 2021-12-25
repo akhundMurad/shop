@@ -34,6 +34,21 @@ class TestOrderedProductBulkCreateAPIView:
 
         assert response.status_code == 400
 
+    def test_product_is_out_of_stock(self, client,
+                                     bulk_create_url, product, db):
+        response = client.post(
+            bulk_create_url,
+            data=[
+                {
+                    'product': product.id,
+                    'product_quantity': product.quantity + 1
+                }
+            ],
+            content_type='application/json'
+        )
+
+        assert response.status_code == 400
+
     def test_return_data(self, client, bulk_create_url, product, db):
         response = client.post(
             bulk_create_url,
