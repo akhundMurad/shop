@@ -1,52 +1,59 @@
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db.models import Model
-from rest_framework import exceptions as rest_exceptions
+from typing import Optional
+
+from django.core.exceptions import ValidationError as DjangoValidationError, \
+    PermissionDenied
+from django.http import Http404
+
+from rest_framework.views import exception_handler
+from rest_framework import exceptions
+from rest_framework.serializers import as_serializer_error
+from rest_framework.response import Response
+
+from backend.exceptions import ApplicationError
 
 
-class ErrorHandlerMixin:
-    model: Model = None
-
-    expected_exceptions = {
-        ValueError: rest_exceptions.ValidationError,
-        ValidationError: rest_exceptions.ValidationError,
-        PermissionError: rest_exceptions.PermissionDenied,
-        ObjectDoesNotExist: rest_exceptions.NotFound
+def handle_exception(exc, ctx) -> Optional[Response]:
+    """
+    {
+        "message": "Error message",
+        "extra": {}
     }
+    """
+    if isinstance(exc, DjangoValidationError):
+        exc = exceptions.ValidationError(as_serializer_error(exc))
 
-    def handle_exception(self, exc):
-        self._add_model_does_not_exist()
+    if isinstance(exc, Http404):
+        exc = exceptions.NotFound()
 
-        if isinstance(exc, tuple(self.expected_exceptions.keys())):
-            drf_exception_class = self.expected_exceptions[exc.__class__]
-            drf_exception = drf_exception_class(get_error_message(exc))
-            return super().handle_exception(drf_exception)
+    if isinstance(exc, PermissionDenied):
+        exc = exceptions.PermissionDenied()
 
-        return super().handle_exception(exc)
+    response = exception_handler(exc, ctx)
 
-    def _add_model_does_not_exist(self):
-        if self.model is not None:
-            self.expected_exceptions[
-                self.model.DoesNotExist
-            ] = rest_exceptions.NotFound
+    if response is None:
+        if isinstance(exc, ApplicationError):
+            data = {
+                "message": exc.message,
+                "extra": exc.extra
+            }
+            return Response(data, status=400)
 
+        return response
 
-def get_error_message(exc):
-    if hasattr(exc, 'message_dict'):
-        return exc.message_dict
-    error_msg = get_first_matching_attr(exc, 'message', 'messages')
+    if isinstance(exc.detail, (list, dict)):
+        response.data = {
+            "detail": response.data
+        }
 
-    if isinstance(error_msg, list):
-        error_msg = ', '.join(error_msg)
+    if isinstance(exc, exceptions.ValidationError):
+        response.data["message"] = "Validation error"
+        response.data["extra"] = {
+            "fields": response.data["detail"]
+        }
+    else:
+        response.data["message"] = response.data["detail"]
+        response.data["extra"] = {}
 
-    if error_msg is None:
-        error_msg = str(exc)
+    del response.data["detail"]
 
-    return error_msg
-
-
-def get_first_matching_attr(obj, *attrs, default=None):
-    for attr in attrs:
-        if hasattr(obj, attr):
-            return getattr(obj, attr)
-
-    return default
+    return response

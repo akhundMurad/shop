@@ -6,10 +6,9 @@ from rest_framework.generics import CreateAPIView
 
 from products.models import Product, OrderedProduct
 from products.services.orderedproduct import bulk_create
-from utils.exceptions import ErrorHandlerMixin
 
 
-class OrderedProductBulkCreateAPIView(ErrorHandlerMixin, CreateAPIView):
+class OrderedProductBulkCreateAPIView(CreateAPIView):
     class InputSerializer(serializers.Serializer):
         product = serializers.PrimaryKeyRelatedField(
             queryset=Product.objects.all()

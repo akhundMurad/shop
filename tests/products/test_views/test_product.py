@@ -61,6 +61,17 @@ class TestProductCreateAPIView:
 
         assert response.status_code == 201
 
+    def test_cost_price_is_higher_than_price(self, create_url, client,
+                                             product_data, db):
+        data = product_data.copy()
+        data['cost_price'] = data['price'] + 1
+        response = client.post(
+            create_url,
+            data=data
+        )
+
+        assert response.status_code == 400
+
     def test_return_data(self, create_url, client, product_data, db):
         response = client.post(create_url, product_data)
 
@@ -84,6 +95,19 @@ class TestProductPartialUpdateAPIView:
         }, content_type='application/json')
 
         assert response.status_code == 200
+
+    def test_cost_price_is_higher_than_price(self, partial_update_url,
+                                             client, db):
+        response = client.patch(
+            partial_update_url,
+            data={
+                'cost_price': 50,
+                'price': 10
+            },
+            content_type='application/json'
+        )
+
+        assert response.status_code == 400
 
     def test_return_data(self, partial_update_url, client, db):
         response = client.patch(partial_update_url, {

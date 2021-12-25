@@ -5,6 +5,7 @@ from products.models import Product
 
 def create_product(**data) -> Product:
     product = Product(**data)
+
     product.full_clean()
     product.save()
 
@@ -17,6 +18,7 @@ def update_product(*, pk: int, **data) -> Product:
     for attr, value in data.items():
         setattr(product, attr, value)
 
+    product.full_clean()
     product.save()
 
     return product

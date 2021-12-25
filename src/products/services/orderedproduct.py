@@ -1,16 +1,13 @@
 from django.core.exceptions import ValidationError
 
-from products.models import OrderedProduct
+from products.models import OrderedProduct, Product
 from products.services.order import create_order
 
 
 def bulk_create(
         *, serializer, data: list[dict]
 ) -> list[OrderedProduct]:
-    prepared_items, errors = get_prepared_items(data, serializer)
-
-    if any(errors):
-        raise ValidationError(errors)
+    prepared_items = get_prepared_items(data, serializer)
 
     prepared_items = add_to_order(prepared_items)
     ordered_products = OrderedProduct.objects.bulk_create(prepared_items)
@@ -29,25 +26,31 @@ def add_to_order(ordered_products: list[OrderedProduct]) -> list:
     return new_ordered_products
 
 
-def get_prepared_items(data: list[dict], serializer) -> tuple:
+def get_prepared_items(data: list[dict], serializer) -> list:
     prepared_objects = []
-    errors = []
 
     if not isinstance(data, list):
         raise ValidationError('Request data must be an array.')
 
     for item in data:
         serialized = serializer(data=item)
-        try:
-            if serialized.is_valid(raise_exception=True):
-                data = serialized.validated_data
-                data.update({
-                    'id': item.get('id', None)
-                })
-                instance = OrderedProduct(**data)
-                prepared_objects.append(instance)
-                errors.append({})
-        except ValidationError as e:
-            errors.append(e.get_full_details())
+        if serialized.is_valid(raise_exception=True):
+            data = serialized.validated_data
+            data.update({
+                'id': item.get('id', None)
+            })
+            instance = OrderedProduct(**data)
 
-    return prepared_objects, errors
+            check_is_out_of_stock(
+                product=instance.product,
+                product_quantity=instance.product_quantity
+            )
+
+            prepared_objects.append(instance)
+
+    return prepared_objects
+
+
+def check_is_out_of_stock(product: Product, product_quantity: int) -> None:
+    if product_quantity > product.quantity:
+        raise ValidationError('Product is out of stock.')
