@@ -1,5 +1,8 @@
-django==4.0
+django==3.2.10
 psycopg2_binary==2.9.2
 djangorestframework==3.13.1
 drf-spectacular==0.21.1
 factory-boy==3.2.1
+celery==5.2.1
+django-celery-beat==2.2.1
+django_redis==5.2.0

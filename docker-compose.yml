@@ -1,14 +1,15 @@
-version: "3"
+version: "3.7"
 
 services:
   backend:
     build:
       context: .
       dockerfile: docker/Dockerfile.app
+    image: backend
     container_name: backend
+    command: sh -c "cd src && python manage.py migrate && python manage.py runserver"
     restart: always
     tty: true
-    command: sh -c "cd src && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     env_file:
@@ -22,6 +23,45 @@ services:
       options:
         max-size: "10m"
         max-file: "1"
+
+
+  celery:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    container_name: celery
+    command: sh -c "celery -A tasks.apps worker -l info"
+    restart: always
+    env_file:
+      - .envfile
+    depends_on:
+      - redis
+      - backend
+      - pg_db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '1'
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    container_name: celery_beat
+    command: sh -c "celery -A tasks.apps beat --loglevel=debug --scheduler django_celery_beat.schedulers:DatabaseScheduler && python manage.py setupperiodicttasks"
+    restart: always
+    env_file:
+      - .envfile
+    depends_on:
+      - redis
+      - backend
+      - pg_db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: '10m'
+        max-file: '1'
 
   pg_db:
     image: postgres:13-alpine
@@ -39,5 +79,21 @@ services:
         max-size: '10m'
         max-file: '1'
 
+  redis:
+    image: redis:alpine
+    working_dir: /data
+    expose:
+      - '6379'
+    volumes:
+      - /data:/data
+    container_name: redis
+    restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '1'
+
 volumes:
   shop_pg_db:
+  redis:
