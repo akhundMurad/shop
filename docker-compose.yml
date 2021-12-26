@@ -16,6 +16,7 @@ services:
       - .envfile
     depends_on:
       - pg_db
+      - redis
     volumes:
       - .:/app
     logging:
