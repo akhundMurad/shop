@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def create_reports_for_today():
-    from reporting import services
+    from reporting.services import report
 
     logger.info('Creating reports for today...')
-    services.create_reports()
+    report.create_reports()
