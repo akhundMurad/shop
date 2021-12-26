@@ -14,9 +14,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'products',
+    'tasks',
 
     'rest_framework',
     'drf_spectacular',
+    'django_redis',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -112,11 +115,14 @@ CELERY_TIMEZONE = TIME_ZONE
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": os.environ.get(
             'REDIS_CACHE_URL',
             'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/1'
         ),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
         "KEY_PREFIX": "cache"
     }
 }
