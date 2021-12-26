@@ -16,14 +16,14 @@ TODAY = timezone.now()
 def yesterday_order() -> OrderFactory:
     with time_machine.travel(TODAY - timedelta(days=1)):
         return OrderFactory(
-            status=Order.Status.ON_PROCESSING
+            status=Order.Status.DONE
         )
 
 
 @pytest.fixture
 def today_order() -> OrderFactory:
     return OrderFactory(
-        status=Order.Status.ON_PROCESSING,
+        status=Order.Status.DONE,
         created_at=TODAY
     )
 
@@ -84,7 +84,7 @@ class TestCreateReports:
                 product.cost_price * ordered_product.product_quantity
         )
 
-        number_of_sold = 2
+        number_of_sold = 1
         number_of_canceled = 1
 
         assert report.proceeds == proceeds

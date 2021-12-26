@@ -36,6 +36,7 @@ class Order(models.Model):
     class Status(models.TextChoices):
         CANCELED = 'canceled', 'отменен'
         ON_PROCESSING = 'on_processing', 'на обработке'
+        DONE = 'done', 'завершен'
 
     status = models.CharField(
         choices=Status.choices,

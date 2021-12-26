@@ -23,20 +23,19 @@ def create_reports():
 def create_report_for_product(product: Product) -> Report:
     ordered_products = product.orderedproduct_set.select_related(
         'order', 'product'
-    ).filter(
-        order__created_at__date=TODAY
+    ).filter(order__created_at__date=TODAY)
+    sold_ordered_products = ordered_products.filter(
+        order__status=Order.Status.DONE
     )
 
-    data = ordered_products.exclude(
-        order__status=Order.Status.CANCELED
-    ).aggregate(
+    data = sold_ordered_products.aggregate(
         product_quantity_sum=Sum('product_quantity')
     )
 
     cost_price = data.get('product_quantity_sum', 0) * product.cost_price
     proceeds = data.get('product_quantity_sum', 0) * product.price
 
-    number_of_sold = ordered_products.count()
+    number_of_sold = sold_ordered_products.count()
     number_of_canceled = ordered_products.filter(
         order__status=Order.Status.CANCELED
     ).count()
