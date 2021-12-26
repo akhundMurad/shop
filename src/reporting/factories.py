@@ -8,6 +8,9 @@ class ReportFactory(DjangoModelFactory):
     class Meta:
         model = Report
 
+    product = factory.SubFactory(
+        'products.factories.ProductFactory'
+    )
     proceeds = factory.fuzzy.FuzzyInteger(50, 100)
     earnings = factory.fuzzy.FuzzyInteger(10, 40)
     number_of_sold = factory.fuzzy.FuzzyInteger(5, 15)

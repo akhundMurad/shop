@@ -18,8 +18,8 @@ def last_week_report(product) -> ReportFactory:
 
 
 @pytest.fixture
-def report(product) -> ReportFactory:
-    return ReportFactory(product=product)
+def report(db) -> ReportFactory:
+    return ReportFactory()
 
 
 @pytest.fixture
@@ -53,10 +53,21 @@ class TestReportListAPIView:
         assert isinstance(item['number_of_canceled'], int)
         assert isinstance(item['created_at'], str)
 
-    def test_filters(self, client, report, last_week_report, db, list_url):
+    def test_date_filters(self, client, report,
+                          last_week_report, db, list_url):
         response = client.get(list_url, {
             'start_date': TODAY - timedelta(days=1),
             'end_date': TODAY + timedelta(days=1)
+        })
+        data = [item['id'] for item in response.data]
+
+        assert len(data) == 1
+        assert report.id in data
+
+    def test_product_filter(self, client, report,
+                            last_week_report, db, list_url):
+        response = client.get(list_url, {
+            'product': report.product_id
         })
         data = [item['id'] for item in response.data]
 

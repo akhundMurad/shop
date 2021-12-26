@@ -14,6 +14,7 @@ class ReportListAPIView(ListAPIView):
     class FilterSerializer(serializers.Serializer):
         start_date = serializers.DateField(required=False)
         end_date = serializers.DateField(required=False)
+        product = serializers.IntegerField(required=False)
 
     class OutputSerializer(serializers.ModelSerializer):
         class Meta:

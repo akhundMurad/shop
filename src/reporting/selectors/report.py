@@ -16,7 +16,7 @@ class ReportFilterSet(FilterSet):
 
     class Meta:
         model = Report
-        fields = ('start_date', 'end_date')
+        fields = ('start_date', 'end_date', 'product')
 
 
 def list_report(filters_data=None) -> QuerySet:
