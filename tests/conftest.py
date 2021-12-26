@@ -1,6 +1,7 @@
 import pytest
 
 from products.factories import ProductFactory, OrderFactory
+from products.models import Order
 
 
 @pytest.fixture
@@ -10,4 +11,4 @@ def product(db) -> ProductFactory:
 
 @pytest.fixture
 def order(db) -> OrderFactory:
-    return OrderFactory()
+    return OrderFactory(status=Order.Status.ON_PROCESSING)
