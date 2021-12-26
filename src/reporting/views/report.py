@@ -1,4 +1,7 @@
+from datetime import date
+
 from django.db.models import QuerySet
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import serializers, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -18,10 +21,30 @@ class ReportListAPIView(ListAPIView):
             fields = ('id', 'product', 'proceeds', 'earnings',
                       'number_of_sold', 'number_of_canceled', 'created_at')
 
+    serializer_class = OutputSerializer
+
     def get_queryset(self, filters=None) -> QuerySet:
         return list_report(filters)
 
-    def list(self, request, *args, **kwargs) -> Response:
+    @extend_schema(
+        methods=['GET'],
+        parameters=[
+            OpenApiParameter(
+                name='start_date',
+                location=OpenApiParameter.QUERY,
+                required=False,
+                type=date
+            ),
+            OpenApiParameter(
+                name='end_date',
+                location=OpenApiParameter.QUERY,
+                required=False,
+                type=date
+            ),
+        ],
+        responses={200: OutputSerializer},
+    )
+    def get(self, request, *args, **kwargs) -> Response:
         filters_serializer = self.FilterSerializer(
             data=request.query_params
         )
