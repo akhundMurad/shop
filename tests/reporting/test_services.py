@@ -7,7 +7,7 @@ from django.utils import timezone
 from products.factories import OrderedProductFactory, OrderFactory
 from products.models import Order
 from reporting.models import Report
-from reporting.services import create_reports
+from reporting.services.report import create_reports
 
 TODAY = timezone.now()
 

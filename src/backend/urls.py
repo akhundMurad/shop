@@ -27,4 +27,5 @@ urlpatterns = [
          name='swagger-ui'),
 
     path('products/', include('products.urls', namespace='products')),
+    path('reporting/', include('reporting.urls', namespace='reporting'))
 ]
