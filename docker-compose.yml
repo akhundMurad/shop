@@ -7,7 +7,7 @@ services:
       dockerfile: docker/Dockerfile.app
     image: backend
     container_name: backend
-    command: sh -c "cd src && python manage.py migrate && python manage.py runserver"
+    command: sh -c "cd src && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     restart: always
     tty: true
     ports:
@@ -86,7 +86,7 @@ services:
     expose:
       - '6379'
     volumes:
-      - /data:/data
+      - /redisdata:/data
     container_name: redis
     restart: unless-stopped
     logging:
