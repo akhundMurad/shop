@@ -15,6 +15,7 @@ INSTALLED_APPS = [
 
     'products',
     'tasks',
+    'reporting',
 
     'rest_framework',
     'drf_spectacular',

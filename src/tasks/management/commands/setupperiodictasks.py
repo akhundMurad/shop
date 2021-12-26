@@ -6,6 +6,7 @@ from django.db import transaction
 from django_celery_beat.models import IntervalSchedule, \
     CrontabSchedule, PeriodicTask
 
+from reporting.tasks import create_reports_for_today
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,17 @@ class Command(BaseCommand):
         CrontabSchedule.objects.all().delete()
         PeriodicTask.objects.all().delete()
 
-        periodic_tasks_data = []
+        periodic_tasks_data = [
+            {
+                'task': create_reports_for_today,
+                'name': 'Create reports for today.',
+                'cron': {
+                    'minute': 59,
+                    'hour': 23
+                },
+                'enabled': True
+            }
+        ]
 
         for period_task in periodic_tasks_data:
             logger.debug(f'Setting up {period_task["task"].name}')
