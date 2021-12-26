@@ -24,7 +24,7 @@ class ProductListAPIView(ListAPIView):
         methods=['GET'],
         responses={200: OutputSerializer(many=True)}
     )
-    def list(self, request, *args, **kwargs) -> Response:
+    def get(self, request, *args, **kwargs) -> Response:
         data = self.OutputSerializer(
             self.get_queryset(),
             many=True
@@ -52,7 +52,7 @@ class ProductCreateAPIView(CreateAPIView):
         request=InputSerializer,
         responses={201: OutputSerializer}
     )
-    def create(self, request, *args, **kwargs) -> Response:
+    def post(self, request, *args, **kwargs) -> Response:
         serialized = self.InputSerializer(data=request.data)
         serialized.is_valid(raise_exception=True)
 

@@ -30,7 +30,7 @@ class OrderedProductBulkCreateAPIView(CreateAPIView):
         request=InputSerializer,
         responses={201: OutputSerializer},
     )
-    def create(self, request, *args, **kwargs) -> Response:
+    def post(self, request, *args, **kwargs) -> Response:
         ordered_products = bulk_create(
             data=request.data, serializer=self.InputSerializer
         )
