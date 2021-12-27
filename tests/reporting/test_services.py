@@ -69,12 +69,18 @@ def create_reports_service(canceled_order, yesterday_ordered_product,
 
 
 class TestCreateReports:
+    def test_num_queries(self, db, canceled_order, yesterday_ordered_product,
+                         ordered_product, ordered_product_1,
+                         django_assert_num_queries):
+        with django_assert_num_queries(4):
+            create_reports()
+
     def test_reports_created(self, product, create_reports_service):
         assert Report.objects.filter(
             product_id=product.id
         ).count() == 1
 
-    def test_reports_data(self, product, ordered_product,
+    def test_reports_data(self, product, ordered_product, ordered_product_1,
                           create_reports_service):
         report = Report.objects.get(
             product_id=product.id
@@ -84,8 +90,8 @@ class TestCreateReports:
                 product.cost_price * ordered_product.product_quantity
         )
 
-        number_of_sold = 1
-        number_of_canceled = 1
+        number_of_sold = ordered_product.product_quantity
+        number_of_canceled = ordered_product_1.product_quantity
 
         assert report.proceeds == proceeds
         assert report.earnings == earnings
