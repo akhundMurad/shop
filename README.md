@@ -26,10 +26,12 @@ REDIS_PORT=6379
 ```
 
 <h4>User guide:</h4>
+
 1. Launch the project via `make up` command.
 2. Now you can go to the address `http://0.0.0.0:8000/` and use API.
 
 <h4>Service urls:</h4>
+
 1. `http://0.0.0.0:8000/` - Server url
 2. `http://0.0.0.0:8000/admin/` - Django admin panel
 3. `http://0.0.0.0:8000/schema/swagger-ui/` - Swagger documentation
